@@ -8,7 +8,7 @@ function Game() {
   const [counter, setCounter] = useState(1);
   const [outcome, setOutcome] = useState("");
   const [points, setPoints] = useState(0);
-
+  ///// what if we dont set bet ??????
   useEffect(() => {
     fetch("http://roll.diceapi.com/json/d6")
       .then((resp) => resp.json())
@@ -28,6 +28,20 @@ function Game() {
     }
 
     setGameHistory([...gameHistory, { result: outcome, round: counter - 3 }]);
+
+    return () => {
+      localStorage.setItem(
+        "gameState",
+        JSON.stringify({
+          history: history,
+          gameHistory: gameHistory,
+          counter: counter,
+          bet: bet,
+          outcome: outcome,
+          points: points,
+        })
+      );
+    };
   }, [counter]);
 
   const winning = () => {
@@ -35,9 +49,15 @@ function Game() {
     setPoints((prev) => prev + 0.1);
   };
 
-  console.log(history);
-  console.log(outcome);
-  console.log(gameHistory);
+  const resumeGame = () => {
+    const gameState = JSON.parse(localStorage.gameState);
+    setHistory(gameState.history);
+    setGameHistory(gameState.gameHistory);
+    setCounter(gameState.counter);
+    setBet(gameState.bet);
+    setOutcome(gameState.outcome);
+    setPoints(gameState.points);
+  };
   const higher = () => {
     setBet("higher");
   };
@@ -51,6 +71,7 @@ function Game() {
   return history.length > 1 ? (
     <div>
       <p>points: {points.toFixed(1)}</p>
+      <p>rounds remaining {30 - (counter - 2)} </p>
       <img
         alt={`http://roll.diceapi.com/images/poorly-drawn/d6/${
           history[history.length - 2]?.dice[0].value
@@ -62,7 +83,9 @@ function Game() {
       <p>Will the next value be higher or lower ?</p>
       <button onClick={higher}>higher</button>
       <button onClick={lower}>lower</button>
-      <button onClick={check}>check</button>
+      <button disabled={bet === "" ? true : false} onClick={check}>
+        check
+      </button>
       <h1>
         {outcome}
         {history[history.length - 2]?.dice[0].value}
@@ -72,7 +95,8 @@ function Game() {
     </div>
   ) : (
     <div>
-      <button onClick={check}>START GAME</button>
+      <button onClick={check}>NEW GAME</button>
+      <button onClick={resumeGame}>RESUME GAME</button>
     </div>
   );
 }
