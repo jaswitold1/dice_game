@@ -91,17 +91,21 @@ function Game() {
 
   return history.length > 1 ? (
     history.length <= 31 ? (
-      <div>
-        <PointsAndRounds counter={counter} points={points} />
-        <DiceImage history={history} />
-        <GameInterface
-          higher={higher}
-          lower={lower}
-          check={check}
-          outcome={outcome}
-          bet={bet}
-        />
-        <History gameHistory={gameHistory} />
+      <div style={{ display: "flex", justifyContent: "flex-end" }}>
+        <div style={{ width: "80vw" }}>
+          <PointsAndRounds counter={counter} points={points} />
+          <DiceImage history={history} />
+          <GameInterface
+            higher={higher}
+            lower={lower}
+            check={check}
+            outcome={outcome}
+            bet={bet}
+          />
+        </div>
+        <div>
+          <History gameHistory={gameHistory} />
+        </div>
       </div>
     ) : (
       <GameOver points={points} playAgain={playAgain} />
