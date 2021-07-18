@@ -1,5 +1,10 @@
 import React, { useState, useEffect } from "react";
+import DiceImage from "./DiceImage";
+import GameInterface from "./GameInterface";
+import GameOver from "./GameOver";
 import History from "./History";
+import PointsAndRounds from "./PointsAndRounds";
+import ResumeGame from "./ResumeGame";
 
 function Game() {
   const [history, setHistory] = useState([]);
@@ -87,39 +92,22 @@ function Game() {
   return history.length > 1 ? (
     history.length <= 31 ? (
       <div>
-        <p>points: {points.toFixed(1)}</p>
-        <p>rounds remaining {30 - (counter - 2)} </p>
-        <img
-          alt={`http://roll.diceapi.com/images/poorly-drawn/d6/${
-            history[history.length - 2]?.dice[0].value
-          }.png`}
-          src={`http://roll.diceapi.com/images/poorly-drawn/d6/${
-            history[history.length - 2]?.dice[0].value
-          }.png`}
+        <PointsAndRounds counter={counter} points={points} />
+        <DiceImage history={history} />
+        <GameInterface
+          higher={higher}
+          lower={lower}
+          check={check}
+          outcome={outcome}
+          bet={bet}
         />
-        <p>Will the next value be higher or lower ?</p>
-        <button onClick={higher}>higher</button>
-        <button onClick={lower}>lower</button>
-        <button disabled={bet === "" ? true : false} onClick={check}>
-          check
-        </button>
-        <h1>{outcome}</h1>
         <History gameHistory={gameHistory} />
       </div>
     ) : (
-      <div>
-        <h1>GAME OVER</h1>
-        <p>Your score: {points.toFixed(1)}</p>
-
-        <button onClick={playAgain}>PLAY AGAIN</button>
-      </div>
+      <GameOver points={points} playAgain={playAgain} />
     )
-  ) : gameOver !== "Game Over" ? (
-    <div>
-      <p>Do You want to resume previous game ?</p>
-      <button onClick={check}>NO</button>
-      <button onClick={resumeGame}>YES</button>
-    </div>
+  ) : localStorage.gameState && gameOver !== "Game Over" ? (
+    <ResumeGame resumeGame={resumeGame} check={check} />
   ) : (
     <div>
       <button onClick={check}>START GAME</button>
