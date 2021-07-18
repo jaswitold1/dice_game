@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
+import History from "./History";
 
 function Game() {
   const [history, setHistory] = useState([]);
+  const [gameHistory, setGameHistory] = useState([]);
   const [bet, setBet] = useState("");
   const [counter, setCounter] = useState(1);
   const [outcome, setOutcome] = useState("");
@@ -14,30 +16,33 @@ function Game() {
 
     if (history.length > 1) {
       if (
-        (bet === true &&
-          history[history.length - 2]?.dice[0].value >
-            history[history.length - 3]?.dice[0].value) ||
-        (bet === false &&
-          history[history.length - 2]?.dice[0].value <
-            history[history.length - 3]?.dice[0].value)
+        (bet === "higher" &&
+          history[history.length - 1]?.dice[0].value >=
+            history[history.length - 2]?.dice[0].value) ||
+        (bet === "lower" &&
+          history[history.length - 1]?.dice[0].value <=
+            history[history.length - 2]?.dice[0].value)
       ) {
-        setOutcome("You lost");
-      } else winning();
+        winning();
+      } else setOutcome("You lost");
     }
+
+    setGameHistory([...gameHistory, { result: outcome, round: counter - 3 }]);
   }, [counter]);
 
   const winning = () => {
-    setOutcome("You win");
+    setOutcome("You won");
     setPoints((prev) => prev + 0.1);
   };
 
   console.log(history);
   console.log(outcome);
+  console.log(gameHistory);
   const higher = () => {
-    setBet(true);
+    setBet("higher");
   };
   const lower = () => {
-    setBet(false);
+    setBet("lower");
   };
   const check = () => {
     setCounter((prev) => prev + 1);
@@ -45,7 +50,7 @@ function Game() {
 
   return history.length > 1 ? (
     <div>
-      <p>points: {points}</p>
+      <p>points: {points.toFixed(1)}</p>
       <img
         alt={`http://roll.diceapi.com/images/poorly-drawn/d6/${
           history[history.length - 2]?.dice[0].value
@@ -60,9 +65,10 @@ function Game() {
       <button onClick={check}>check</button>
       <h1>
         {outcome}
-        {/* {history[history.length - 2]?.dice[0].value}
-        {history[history.length - 3]?.dice[0].value} */}
+        {history[history.length - 2]?.dice[0].value}
+        {history[history.length - 3]?.dice[0].value}
       </h1>
+      <History gameHistory={gameHistory} />
     </div>
   ) : (
     <div>
